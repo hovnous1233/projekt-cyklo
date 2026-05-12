@@ -9,11 +9,13 @@
 <h1>Závody</h1>
 <?php $table = new \CodeIgniter\View\Table(); 
 $table->setHeading("Seznam zemí"); 
-
-foreach ($lokace as  $row){
-    $table->addRow($row->country);
+/** @var array $lokace */
+/** @var object $pager */
+foreach ($lokace as $row) {
+    $viditelnost = strtolower(trim($row->country));
+    $vlajka = '<span class="fi fi-' . $viditelnost . '"></span>';
+    $table->addRow(anchor("zavody/" . $viditelnost, $vlajka));
 }
-
 $template = array(
 'table_open'=> '<table class="table table-bordered">',
 'thead_open'=> '<thead>',

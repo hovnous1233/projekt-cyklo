@@ -16,7 +16,7 @@ class MainPage extends BaseController
         $perPage = $config->perPage;
 
         $lokace = new RaceYear();
-        $dataLokace = $lokace->paginate($perPage);
+        $dataLokace = $lokace->select("country")->distinct()->orderBy("country", "asc")->paginate($perPage);
 
         $data = [
             "lokace" => $dataLokace,
