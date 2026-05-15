@@ -32,16 +32,30 @@ class MainPage extends BaseController
         
         $lokaceZavodu = new RaceYear(); 
         
+        // Nejprve získáme data o zemi
         $dataLokace = $lokaceZavodu->where('country', $country)->first();
         
-        $dataZavod = $lokaceZavodu->select("race.default_name, COUNT(*) as pocet") ->join("race", "race.id = race_year.id_race", "inner")->where("race.country", $dataLokace->country)->groupBy("race.default_name")->orderBy("race.default_name", "asc")->paginate($perPage);
+        if (!$dataLokace) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+    
+        // TADY JE TA ÚPRAVA:
+        // Místo názvů tabulek použijeme aliasy 'ry' (race_year) a 'r' (race)
+        // Tím se vyhneme duplicitě názvů
+        $dataZavod = $lokaceZavodu
+            ->select("r.id, r.default_name, COUNT(*) as pocet") 
+            ->from('race_year as ry') // Definujeme alias pro hlavní tabulku
+            ->join("race as r", "r.id = ry.id_race", "inner") 
+            ->where("r.country", $dataLokace->country)
+            ->groupBy("r.id, r.default_name")
+            ->orderBy("r.default_name", "asc")
+            ->paginate($perPage);
     
         $data = [
             "lokace" => $dataZavod,
             "pager"  => $lokaceZavodu->pager 
         ];
         
-        echo view("zavody", $data); 
+        return view("zavody", $data); 
     }
-}
-
+    }

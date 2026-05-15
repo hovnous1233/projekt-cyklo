@@ -8,14 +8,11 @@
 
 <h1>Závody</h1>
 <?php $table = new \CodeIgniter\View\Table(); 
-$table->setHeading("Seznam závodů","Počet závodů"); 
-/** @var array $lokace */
+$table->setHeading("Závod","Datum závodu", "Počet etap", "Celková délka závodů"); 
+/** @var array $rocniky */
 /** @var object $pager */
-foreach ($lokace as $row) {
-    // SPRÁVNÝ ZÁPIS: $row->id získá ID z aktuálního řádku v databázi
-    $odkaz = anchor("rocniky/" . $row->id, $row->default_name);
-    
-    $table->addRow($odkaz, $row->pocet);
+foreach ($rocniky as $row) {
+    $table->addRow($row->real_name, $row->date,$row->pocet,$row->distance);
 }
 $template = array(
 'table_open'=> '<table class="table table-bordered">',
