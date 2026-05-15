@@ -4,15 +4,15 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class RaceYear extends Model
+class Stage extends Model
 {
-    protected $table            = 'race_year';
+    protected $table            = 'stage';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'object';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['real_name', 'id_race', 'year', 'start_date', 'end_date', 'uci_tour', 'logo', 'sex', 'category', 'country'];
+    protected $allowedFields    = [];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
