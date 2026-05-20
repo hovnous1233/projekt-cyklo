@@ -4,10 +4,11 @@
 
 <?=$this->section("content");?>
 
-<h1>Závody</h1>
+<h1>Země závodů</h1>
 
 <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3 my-3">
 <?php
+/** @var object $pager */
 /** @var array $lokace */
 foreach ($lokace as $row):
     $viditelnost = strtolower(trim($row->country));

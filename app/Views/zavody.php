@@ -6,7 +6,7 @@
 
 <?=$this->section("content");?>
 
-<h1>Závody</h1>
+<h1>Jednotlivé závody</h1>
 <?php $table = new \CodeIgniter\View\Table(); 
 $table->setHeading("Seznam závodů","Počet závodů"); 
 /** @var array $lokace */
