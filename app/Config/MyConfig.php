@@ -4,7 +4,7 @@ use CodeIgniter\Config\BaseConfig;
 
 class MyConfig extends BaseConfig 
 {
-    public $perPage = "10";
+    public $perPage = "12";
 
     var $form = array(
         'addBtn' => '<i class="fa-solid fa-circle-plus fa-xs"></i> Přidat',

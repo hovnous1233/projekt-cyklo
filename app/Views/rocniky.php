@@ -1,8 +1,16 @@
+<?php helper('form'); ?>
 <?=$this->extend("layout/template");?>
 
 <?=$this->section("content");?>
 
 <h1>Ročníky závodů</h1>
+
+<?php if (session()->getFlashdata('message')) : ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <?= session()->getFlashdata('message') ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
 
 <div class="mb-3">
     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalRocnik" id="btnPridat">
@@ -11,18 +19,18 @@
 </div>
 
 <?php $table = new \CodeIgniter\View\Table(); 
-// Přidán sloupec "Akce" do záhlaví
-$table->setHeading("Závod","Datum závodu", "Počet etap", "Celková délka závodů", "Akce"); 
+$table->setHeading("Závod","Datum závodů", "Počet etap", "Celková délka závodů", "Akce"); 
 
 /** @var array $rocniky */
 /** @var object $pager */
+/** @var int|string $id_race */ // TENTO ŘÁDEK napoví editoru, co je proměnná $id_race zač
 foreach ($rocniky as $row) {
-    // Příprava tlačítek pro každý řádek (využívá ID ročníku)
     $akce = '<button class="btn btn-sm btn-warning edit-btn" data-id="' . $row->id . '" data-bs-toggle="modal" data-bs-target="#modalRocnik">Upravit</button> ';
-    $akce .= '<a href="' . base_url('rocniky/delete/' . $row->id) . '" class="btn btn-sm btn-danger" onclick="return confirm(\'Opravdu smazat?\')">Smazat</a>';
+    $akce .= '<a href="' . base_url("rocniky/delete/{$row->id}/{$id_race}") . '" class="btn btn-sm btn-danger" onclick="return confirm(\'Opravdu smazat?\')">Smazat</a>';
 
-    // Přidání řádku do tabulky včetně tlačítek
-    $table->addRow($row->real_name, $row->date, $row->pocet, $row->distance, $akce);
+    $pocetEtap = ($row->distance == 0) ? 0 : $row->pocet;
+
+    $table->addRow($row->real_name, $row->date, $pocetEtap, $row->distance, $akce);
 }
 
 $template = array(
@@ -54,58 +62,82 @@ echo $pager->links();
 
 <div class="modal fade" id="modalRocnik" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
-        <form action="" method="post" enctype="multipart/form-data" id="formRocnik">
+        <?= form_open_multipart(base_url('rocniky/save'), ['id' => 'formRocnik']) ?>
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitle">Správa ročníku</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" name="id_race" value="<?= $id_race ?? '' ?>">
-                    <input type="hidden" name="id" id="rocnikId" value="">
+                    <?= form_hidden('id_race', $id_race ?? '') ?>
+                    <?= form_hidden('country', $country ?? '') ?>
+                    
+                    <?= form_input([
+                        'type'  => 'hidden',
+                        'name'  => 'id',
+                        'id'    => 'rocnikId',
+                        'value' => ''
+                    ]) ?>
                     
                     <div class="mb-3">
-                        <label class="form-label">Název závodu:</label>
-                        <input type="text" name="real_name" class="form-control" required>
+                        <label class="form-label">Název závodů:</label>
+                        <?= form_input([
+                            'name'        => 'real_name',
+                            'id'          => 'realNameInput',
+                            'class'       => 'form-control',
+                            'value'       => old('real_name', $vychozi_nazev ?? ''),
+                            'required'    => 'required'
+                        ]) ?>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Rok:</label>
-                        <select name="year" class="form-select">
-                            <?php for($y = date('Y') + 1; $y >= 1900; $y--): ?>
-                                <option value="<?= $y ?>"><?= $y ?></option>
-                            <?php endfor; ?>
-                        </select>
+                        <label class="form-label">Rok závodů:</label>
+                        <?php 
+                        $years_options = [];
+                        for($y = date('Y') + 1; $y >= 1900; $y--) {
+                            $years_options[$y] = $y;
+                        }
+                        echo form_dropdown('year', $years_options, date('Y'), ['class' => 'form-select', 'id' => 'yearSelect']);
+                        ?>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Pohlaví:</label>
-                        <select name="sex" class="form-select">
-                            <option value="M">Muži</option>
-                            <option value="W">Ženy</option>
-                        </select>
+                        <?= form_dropdown('sex', [
+                            'M'   => 'Muži',
+                            'W'   => 'Ženy',
+                            'Mix' => 'Mix'
+                        ], 'M', ['class' => 'form-select', 'id' => 'sexSelect']) ?>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Kategorie:</label>
-                        <select name="category" class="form-select">
-                            <option value="Elite">Elite</option>
-                            <option value="U23">U23</option>
-                            <option value="Junior">Junior</option>
-                        </select>
+                        <?= form_dropdown('category', [
+                            'E' => 'Elite',
+                            'U' => 'U23',
+                            'J' => 'Junior'
+                        ], 'E', ['class' => 'form-select', 'id' => 'categorySelect']) ?>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Logo (obrázek):</label>
-                        <input type="file" name="logo" class="form-control">
+                        <label class="form-label">Logo závodů (PNG/JPG):</label>
+                        <?= form_upload([
+                            'name'   => 'logo',
+                            'class'  => 'form-control',
+                            'accept' => 'image/png, image/jpeg'
+                        ]) ?>
+                        <div id="aktualniLogo" class="mt-2 d-none">
+                            <small class="text-muted">Stávající logo:</small><br>
+                            <img src="" id="logoPreview" style="max-height: 50px;">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zavřít</button>
-                    <button type="submit" class="btn btn-primary">Uložit</button>
+                    <?= form_submit('submit', 'Uložit', ['class' => 'btn btn-primary']) ?>
                 </div>
             </div>
-        </form>
+        <?= form_close() ?>
     </div>
 </div>
 
@@ -114,31 +146,43 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('formRocnik');
     const modalTitle = document.getElementById('modalTitle');
     const rocnikIdInput = document.getElementById('rocnikId');
+    const realNameInput = document.getElementById('realNameInput');
+    const yearSelect = document.getElementById('yearSelect');
+    const sexSelect = document.getElementById('sexSelect');
+    const categorySelect = document.getElementById('categorySelect');
+    const aktualniLogoDiv = document.getElementById('aktualniLogo');
+    const logoPreview = document.getElementById('logoPreview');
+    
+    const vychoziNazevZavodu = "<?= esc($vychozi_nazev ?? '') ?>";
 
-    // Nastavení modalu pro PŘIDÁNÍ
     document.getElementById('btnPridat').addEventListener('click', function() {
         modalTitle.textContent = 'Přidat nový ročník';
-        form.setAttribute('action', '<?= base_url("rocniky/add") ?>');
         form.reset();
         rocnikIdInput.value = '';
+        realNameInput.value = vychoziNazevZavodu;
+        aktualniLogoDiv.classList.add('d-none');
     });
 
-    // Nastavení modalu pro ÚPravu (Načítání dat na pozadí přes FormularUpravit)
     document.querySelectorAll('.edit-btn').forEach(button => {
         button.addEventListener('click', function () {
             const id = this.getAttribute('data-id');
             modalTitle.textContent = 'Upravit ročník';
-            form.setAttribute('action', '<?= base_url("rocniky/edit") ?>');
             rocnikIdInput.value = id;
 
-            // AJAX požadavek na getData metodu ve FormularUpravit
             fetch('<?= base_url("rocniky/edit-data") ?>/' + id)
                 .then(response => response.json())
                 .then(data => {
-                    form.querySelector('input[name="real_name"]').value = data.real_name;
-                    form.querySelector('select[name="year"]').value = data.year;
-                    form.querySelector('select[name="sex"]').value = data.sex;
-                    form.querySelector('select[name="category"]').value = data.category;
+                    realNameInput.value = data.real_name;
+                    yearSelect.value = data.year;
+                    sexSelect.value = data.sex;
+                    categorySelect.value = data.category;
+                    
+                    if(data.logo) {
+                        logoPreview.src = '<?= base_url("uploads/logos") ?>/' + data.logo;
+                        aktualniLogoDiv.classList.remove('d-none');
+                    } else {
+                        aktualniLogoDiv.classList.add('d-none');
+                    }
                 })
                 .catch(error => console.error('Chyba při načítání dat:', error));
         });

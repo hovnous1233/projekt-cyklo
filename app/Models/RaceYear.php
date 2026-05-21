@@ -15,7 +15,7 @@ class RaceYear extends Model
     protected $allowedFields    = ['real_name', 'id_race', 'year', 'start_date', 'end_date', 'uci_tour', 'logo', 'sex', 'category', 'country'];
 
     protected bool $allowEmptyInserts = false;
-    protected bool $updateOnlyChanged = true;
+    protected bool $updateOnlyChanged = false;
 
     protected array $casts = [];
     protected array $castHandlers = [];
