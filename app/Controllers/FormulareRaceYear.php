@@ -13,6 +13,7 @@ class FormulareRaceYear extends BaseController
         $model = new RaceYear();
         
         $id = $this->request->getPost('id');
+        $id_race = $this->request->getPost('id_race'); 
         $rok = $this->request->getPost('year');
         $customDate = $rok . "-01-01";
 
@@ -28,7 +29,7 @@ class FormulareRaceYear extends BaseController
 
         // Pokud jde o nový záznam, přidáme i id_race a country
         if (empty($id)) {
-            $data['id_race'] = $this->request->getPost('id_race');
+            $data['id_race'] = $id_race;
             $data['country'] = $this->request->getPost('country');
         }
 
@@ -42,8 +43,13 @@ class FormulareRaceYear extends BaseController
             // Pokud upravujeme, smažeme staré logo
             if (!empty($id)) {
                 $stary = $model->find($id);
-                if ($stary && !empty($stary->logo) && file_exists(ROOTPATH . 'public/uploads/logos/' . $stary->logo)) {
-                    unlink(ROOTPATH . 'public/uploads/logos/' . $stary->logo);
+                if ($stary) {
+                    // BEZPEČNÉ VYTAŽENÍ LOGA: Zkusí objekt ($stary->logo), pokud selže, zkusí pole ($stary['logo'])
+                    $stareLogo = $stary->logo ?? $stary['logo'] ?? '';
+                    
+                    if (!empty($stareLogo) && file_exists(ROOTPATH . 'public/uploads/logos/' . $stareLogo)) {
+                        unlink(ROOTPATH . 'public/uploads/logos/' . $stareLogo);
+                    }
                 }
             }
             
@@ -62,7 +68,8 @@ class FormulareRaceYear extends BaseController
             $zprava = 'Ročník byl úspěšně přidán.';
         }
 
-        return redirect()->back()->with('message', $zprava);
+        // Přesměrování na čistou URL adresu tabulky ročníků
+        return redirect()->to(base_url('rocniky/' . $id_race))->with('message', $zprava);
     }
 
     public function getData($id)
@@ -77,8 +84,13 @@ class FormulareRaceYear extends BaseController
         $model = new RaceYear();
 
         $rocnik = $model->find($id);
-        if ($rocnik && !empty($rocnik->logo) && file_exists(ROOTPATH . 'public/uploads/logos/' . $rocnik->logo)) {
-            unlink(ROOTPATH . 'public/uploads/logos/' . $rocnik->logo);
+        if ($rocnik) {
+            // BEZPEČNÉ VYTAŽENÍ LOGA: Stejná oprava pro smazání
+            $logo = $rocnik->logo ?? $rocnik['logo'] ?? '';
+            
+            if (!empty($logo) && file_exists(ROOTPATH . 'public/uploads/logos/' . $logo)) {
+                unlink(ROOTPATH . 'public/uploads/logos/' . $logo);
+            }
         }
 
         $model->delete($id);
