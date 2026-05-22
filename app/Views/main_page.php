@@ -1,5 +1,4 @@
-<?php
-?>
+<?php helper('country'); ?>
 <?=$this->extend("layout/template");?>
 
 <?=$this->section("content");?>
@@ -24,7 +23,7 @@
                         <div class="mb-3">
                             <span class="fi fi-<?= $viditelnost ?> shadow-sm rounded border border-light-subtle" style="font-size: 5.5rem; display: block;"></span>
                         </div>
-                        <span class="fw-bold text-secondary text-uppercase small tracking-wider"><?= esc($viditelnost) ?></span>
+                        <span class="fw-bold text-secondary small"><?= esc(country_name($viditelnost)) ?></span>
                     </div>
                 </div>
             </a>

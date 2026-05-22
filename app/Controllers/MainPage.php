@@ -10,6 +10,7 @@ use Config\MyConfig;
 
 class MainPage extends BaseController
 {
+    protected $helpers = ['country'];
     public function index()
     {
         $config = new MyConfig();
