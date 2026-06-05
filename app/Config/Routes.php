@@ -7,11 +7,7 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'MainPage::index');
 $routes->get("zavody/(:any)", "MainPage::zavody/$1");
-
 $routes->post('rocniky/save', 'FormulareRaceYear::save');
-
 $routes->get('rocniky/edit-data/(:num)', 'FormulareRaceYear::getData/$1');
-
 $routes->get('rocniky/delete/(:num)/(:num)', 'FormulareRaceYear::delete/$1/$2');
-
 $routes->get("rocniky/(:any)", "Rocniky::index/$1");
