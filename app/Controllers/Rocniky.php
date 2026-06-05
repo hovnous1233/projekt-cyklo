@@ -48,17 +48,4 @@ class Rocniky extends BaseController
 
         return view("rocniky", $data);
     }
-
-    public function delete($id, $id_race)
-    {
-        $model = new RaceYear();
-        
-        $rocnik = $model->find($id);
-        if ($rocnik && $rocnik['logo'] && file_exists(ROOTPATH . 'public/uploads/logos/' . $rocnik['logo'])) {
-            unlink(ROOTPATH . 'public/uploads/logos/' . $rocnik['logo']);
-        }
-
-        $model->delete($id);
-        return redirect()->to(base_url('rocniky/' . $id_race))->with('message', 'Ročník byl úspěšně smazán.');
-    }
 }

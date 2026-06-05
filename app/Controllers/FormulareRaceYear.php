@@ -17,7 +17,6 @@ class FormulareRaceYear extends BaseController
         $rok = $this->request->getPost('year');
         $customDate = $rok . "-01-01";
 
-        // Základní data společná pro insert i update
         $data = [
             'real_name'  => $this->request->getPost('real_name'),
             'year'       => $rok,
@@ -27,25 +26,21 @@ class FormulareRaceYear extends BaseController
             'category'   => $this->request->getPost('category'),
         ];
 
-        // Pokud jde o nový záznam, přidáme i id_race a country
         if (empty($id)) {
             $data['id_race'] = $id_race;
             $data['country'] = $this->request->getPost('country');
         }
 
-        // Zpracování souboru (loga)
         $file = $this->request->getFile('logo');
         if ($file && $file->isValid() && !$file->hasMoved()) {
             if (!is_dir(ROOTPATH . 'public/uploads/logos')) {
                 mkdir(ROOTPATH . 'public/uploads/logos', 0777, true);
             }
 
-            // Pokud upravujeme, smažeme staré logo
             if (!empty($id)) {
                 $stary = $model->find($id);
                 if ($stary) {
-                    // BEZPEČNÉ VYTAŽENÍ LOGA: Zkusí objekt ($stary->logo), pokud selže, zkusí pole ($stary['logo'])
-                    $stareLogo = $stary->logo ?? $stary['logo'] ?? '';
+                    $stareLogo = $stary->logo ?? '';
                     
                     if (!empty($stareLogo) && file_exists(ROOTPATH . 'public/uploads/logos/' . $stareLogo)) {
                         unlink(ROOTPATH . 'public/uploads/logos/' . $stareLogo);
@@ -59,16 +54,13 @@ class FormulareRaceYear extends BaseController
         }
 
         if (!empty($id)) {
-            // Update stávajícího ročníku
             $model->update($id, $data);
             $zprava = 'Ročník byl úspěšně upraven.';
         } else {
-            // Zápis nového ročníku
             $model->save($data);
             $zprava = 'Ročník byl úspěšně přidán.';
         }
 
-        // Přesměrování na čistou URL adresu tabulky ročníků
         return redirect()->to(base_url('rocniky/' . $id_race))->with('message', $zprava);
     }
 
@@ -85,8 +77,7 @@ class FormulareRaceYear extends BaseController
 
         $rocnik = $model->find($id);
         if ($rocnik) {
-            // BEZPEČNÉ VYTAŽENÍ LOGA: Stejná oprava pro smazání
-            $logo = $rocnik->logo ?? $rocnik['logo'] ?? '';
+            $logo = $rocnik->logo ?? '';
             
             if (!empty($logo) && file_exists(ROOTPATH . 'public/uploads/logos/' . $logo)) {
                 unlink(ROOTPATH . 'public/uploads/logos/' . $logo);

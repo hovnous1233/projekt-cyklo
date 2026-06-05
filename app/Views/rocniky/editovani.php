@@ -1,5 +1,4 @@
 <?php 
-// Detekce parametru ?edit_id v URL adrese
 $edit_id = request()->getGet('edit_id');
 $edit_data = null;
 if ($edit_id) {

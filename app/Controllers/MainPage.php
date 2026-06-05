@@ -27,7 +27,6 @@ class MainPage extends BaseController
 
     }
     
-    
     public function zavody($country)
     {
         $config = new MyConfig();
