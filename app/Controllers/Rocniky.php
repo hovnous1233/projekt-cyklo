@@ -18,23 +18,16 @@ class Rocniky extends BaseController
         $rocniky = new RaceYear();
 
         $dataRocniku = $rocniky
-            ->select("race_year.id, race_year.real_name, race_year.start_date as date, COUNT(*) as pocet, COALESCE(SUM(cyklo_stage.distance), 0) as distance, race.default_name, race.country as race_country")
-            ->join("stage", "stage.id_race_year = race_year.id", "left")
-            ->join("race", "race.id = race_year.id_race", "inner")
-            ->where("race_year.id_race", $id_race)
-            ->groupBy("race_year.id, race.default_name, race.country")
-            ->orderBy("race_year.year", "desc")
-            ->paginate($perPage);
+            ->select("race_year.id, race_year.real_name, race_year.start_date as date, COUNT(*) as pocet, COALESCE(SUM(cyklo_stage.distance), 0) as distance, race.default_name, race.country as race_country")->join("stage", "stage.id_race_year = race_year.id", "left")->join("race", "race.id = race_year.id_race", "inner")->where("race_year.id_race", $id_race)->groupBy("race_year.id, race.default_name, race.country")->orderBy("race_year.year", "desc")->paginate($perPage);
 
         $vychoziNazev = !empty($dataRocniku) ? ($dataRocniku[0]->default_name ?? '') : '';
-        $zemeZavodu = !empty($dataRocniku) ? ($dataRocniku[0]->race_country ?? '') : '';
+        
 
         if (empty($vychoziNazev)) {
             $raceModel = new Race();
             $zavod = $raceModel->find($id_race);
             if ($zavod) {
                 $vychoziNazev = $zavod['default_name'] ?? $zavod->default_name ?? '';
-                $zemeZavodu = $zavod['country'] ?? $zavod->country ?? '';
             }
         }
 
@@ -43,7 +36,7 @@ class Rocniky extends BaseController
             "pager"         => $rocniky->pager,
             "id_race"       => $id_race,
             "vychozi_nazev" => $vychoziNazev,
-            "country"       => $zemeZavodu
+            
         ];
 
         return view("rocniky", $data);

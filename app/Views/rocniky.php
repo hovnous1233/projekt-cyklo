@@ -12,42 +12,23 @@
             <p class="text-muted small mb-0">Správa jednotlivých ročníků, etap a parametrů závodu</p>
         </div>
         <div>
-            <button class="btn btn-success d-inline-flex align-items-center px-3 py-2 fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalPridatRocnik">
+            <button class="btn btn-success d-inline-flex align-items-center fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalPridatRocnik">
                 Přidat ročník
             </button>
         </div>
     </div>
 
-    <?php if (session()->getFlashdata('message')) : ?>
-        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
-            <div class="d-flex align-items-center">
-                <span class="me-2">✓</span>
-                <div><?= session()->getFlashdata('message') ?></div>
-            </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
-
     <div class="card border border-light-subtle shadow-sm overflow-hidden mb-4">
         <?php 
         $table = new \CodeIgniter\View\Table(); 
-        $table->setHeading("Závod", "Datum závodů", "Počet etap", "Celková délka závodů", "Akce"); 
+        $table->setHeading("Závod", "Datum závodů", "Počet etap", "Celková délka závodů","",""); 
 
         foreach ($rocniky as $row) {
-            $akce = '<a href="' . current_url() . '?edit_id=' . $row->id . '" class="btn btn-sm btn-outline-warning me-1 fw-semibold">Upravit</a> ';
-            $akce .= '<a href="' . base_url("rocniky/delete/{$row->id}/{$id_race}") . '" class="btn btn-sm btn-outline-danger fw-semibold" onclick="return confirm(\'Opravdu smazat?\')">Smazat</a>';
-
-            $vystup_distance = isset($row->distance) ? $row->distance : 0;
-            $vystup_pocet = isset($row->pocet) ? $row->pocet : 0;
-            $datumZavodu = isset($row->date) ? $row->date : '-';
+            $editovani ='<a href="'.base_url('rocniky/'.$id_race.'?edit_id='.$row->id).'"class="btn btn-sm btn-outline-warning fw-semibold">Upravit</a> ';
+            $mazani ='<a href="'.base_url('rocniky/delete/'.$row->id).'"class="btn btn-sm btn-outline-danger fw-semibold">Smazat</a>';
 
             $table->addRow(
-                '<span class="fw-semibold text-dark">' . esc($row->real_name) . '</span>', 
-                $datumZavodu, 
-                '<span class="badge bg-light text-dark border">' . $vystup_pocet . '</span>', 
-                $vystup_distance . ' km', 
-                $akce
-            );
+                $row->real_name, $row->date,$row->pocet, ($row->distance ?? 0) .' km', $editovani, $mazani);
         }
 
         $template = array(
@@ -62,7 +43,7 @@
             'tbody_close'        => '</tbody>',
             'row_start'          => '<tr>',
             'row_end'            => '</tr>',
-            'cell_start'         => '<td class="p-3">',
+            'cell_start'         => '<td class="    ">',
             'cell_end'           => '</td>',
             'table_close'        => '</table>'
         );

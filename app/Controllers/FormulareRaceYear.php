@@ -10,25 +10,23 @@ class FormulareRaceYear extends BaseController
 
     public function save()
     {
-        $model = new RaceYear();
+        $raceyear = new RaceYear();
         
         $id = $this->request->getPost('id');
         $id_race = $this->request->getPost('id_race'); 
         $rok = $this->request->getPost('year');
-        $customDate = $rok . "-01-01";
+        $rokzavodu = $rok . "-01-01";
 
         $data = [
             'real_name'  => $this->request->getPost('real_name'),
             'year'       => $rok,
-            'start_date' => $customDate,
-            'end_date'   => $customDate,
+            'start_date' => $rokzavodu,
             'sex'        => $this->request->getPost('sex'),
             'category'   => $this->request->getPost('category'),
         ];
 
         if (empty($id)) {
             $data['id_race'] = $id_race;
-            $data['country'] = $this->request->getPost('country');
         }
 
         $file = $this->request->getFile('logo');
@@ -36,11 +34,10 @@ class FormulareRaceYear extends BaseController
             if (!is_dir(ROOTPATH . 'public/uploads/logos')) {
                 mkdir(ROOTPATH . 'public/uploads/logos', 0777, true);
             }
-
             if (!empty($id)) {
-                $stary = $model->find($id);
+                $stary = $raceyear->find($id);
                 if ($stary) {
-                    $stareLogo = $stary->logo ?? '';
+                    $stareLogo = $stary->logo ?? $stary['logo'] ?? '';
                     
                     if (!empty($stareLogo) && file_exists(ROOTPATH . 'public/uploads/logos/' . $stareLogo)) {
                         unlink(ROOTPATH . 'public/uploads/logos/' . $stareLogo);
@@ -48,43 +45,22 @@ class FormulareRaceYear extends BaseController
                 }
             }
             
-            $newName = $file->getRandomName();
-            $file->move(ROOTPATH . 'public/uploads/logos', $newName);
-            $data['logo'] = $newName;
         }
 
         if (!empty($id)) {
-            $model->update($id, $data);
-            $zprava = 'Ročník byl úspěšně upraven.';
+            $raceyear->update($id, $data);
         } else {
-            $model->save($data);
-            $zprava = 'Ročník byl úspěšně přidán.';
+            $raceyear->save($data);
         }
-
-        return redirect()->to(base_url('rocniky/' . $id_race))->with('message', $zprava);
-    }
-
-    public function getData($id)
-    {
-        $model = new RaceYear();
-        $data = $model->find($id);
-        return $this->response->setJSON($data);
+        return redirect()->to(base_url('rocniky/' . $id_race));
     }
 
     public function delete($id, $id_race)
     {
-        $model = new RaceYear();
-
-        $rocnik = $model->find($id);
-        if ($rocnik) {
-            $logo = $rocnik->logo ?? '';
-            
-            if (!empty($logo) && file_exists(ROOTPATH . 'public/uploads/logos/' . $logo)) {
-                unlink(ROOTPATH . 'public/uploads/logos/' . $logo);
-            }
-        }
-
-        $model->delete($id);
+        $rocnik = new RaceYear();
+        $rocnik->find($id);
+        $rocnik->delete($id);
         return redirect()->to(base_url('rocniky/' . $id_race))->with('message', 'Ročník byl úspěšně smazán.');
     }
+
 }
