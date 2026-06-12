@@ -21,12 +21,14 @@ class FormulareRaceYear extends BaseController
             'real_name'  => $this->request->getPost('real_name'),
             'year'       => $rok,
             'start_date' => $rokzavodu,
+            'end_date'   => $rokzavodu,
             'sex'        => $this->request->getPost('sex'),
             'category'   => $this->request->getPost('category'),
         ];
 
         if (empty($id)) {
             $data['id_race'] = $id_race;
+            $data['country'] = $this->request->getPost('country');
         }
 
         $file = $this->request->getFile('logo');
@@ -44,7 +46,6 @@ class FormulareRaceYear extends BaseController
                     }
                 }
             }
-            
         }
 
         if (!empty($id)) {
@@ -58,9 +59,7 @@ class FormulareRaceYear extends BaseController
     public function delete($id, $id_race)
     {
         $rocnik = new RaceYear();
-        $rocnik->find($id);
         $rocnik->delete($id);
-        return redirect()->to(base_url('rocniky/' . $id_race))->with('message', 'Ročník byl úspěšně smazán.');
+        return redirect()->to(base_url('rocniky/' . $id_race));
     }
-
 }

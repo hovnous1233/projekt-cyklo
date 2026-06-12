@@ -21,14 +21,17 @@
     <div class="card border border-light-subtle shadow-sm overflow-hidden mb-4">
         <?php 
         $table = new \CodeIgniter\View\Table(); 
-        $table->setHeading("Závod", "Datum závodů", "Počet etap", "Celková délka závodů","",""); 
-
+        $table->setHeading("Závod", "Datum startu","Datum konce", "Počet etap", "Celková délka závodů","",""); 
+        /** @var object $pager */
+        /** @var array $rocniky */
+        /** @var object $id_race */
         foreach ($rocniky as $row) {
             $editovani ='<a href="'.base_url('rocniky/'.$id_race.'?edit_id='.$row->id).'"class="btn btn-sm btn-outline-warning fw-semibold">Upravit</a> ';
-            $mazani ='<a href="'.base_url('rocniky/delete/'.$row->id).'"class="btn btn-sm btn-outline-danger fw-semibold">Smazat</a>';
-
+            $mazani ='<a href="'.base_url('rocniky/delete/'.$row->id.'/'.$id_race).'" class="btn btn-sm btn-outline-danger fw-semibold"">Smazat</a>';
+            $start = date('d.m.Y', strtotime($row->start_date));
+            $konec = date('d.m.Y', strtotime($row->end_date));
             $table->addRow(
-                $row->real_name, $row->date,$row->pocet, ($row->distance ?? 0) .' km', $editovani, $mazani);
+                $row->real_name, $start,$konec,$row->pocet, $row->distance.' km', $editovani, $mazani);
         }
 
         $template = array(
@@ -43,7 +46,7 @@
             'tbody_close'        => '</tbody>',
             'row_start'          => '<tr>',
             'row_end'            => '</tr>',
-            'cell_start'         => '<td class="    ">',
+            'cell_start'         => '<td class="  ">',
             'cell_end'           => '</td>',
             'table_close'        => '</table>'
         );
