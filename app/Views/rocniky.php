@@ -46,7 +46,7 @@
             'tbody_close'        => '</tbody>',
             'row_start'          => '<tr>',
             'row_end'            => '</tr>',
-            'cell_start'         => '<td class="  ">',
+            'cell_start'         => '<td class="">',
             'cell_end'           => '</td>',
             'table_close'        => '</table>'
         );

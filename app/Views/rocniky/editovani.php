@@ -54,8 +54,8 @@ if ($edit_id) {
                             <label class="form-label fw-semibold small text-secondary">Pohlaví:</label>
                             <?= form_dropdown('sex', [
                                 ''    => 'Vyberte...',
-                                'M'   => 'Muži',
-                                'W'   => 'Ženy'
+                                'M'   => 'Muž',
+                                'W'   => 'Žena'
                             ], $edit_data->sex ?? '', ['class' => 'form-select border-light-subtle', 'required' => 'required']) ?>
                         </div>
                     </div>
